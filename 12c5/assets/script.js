@@ -1,7 +1,7 @@
 // Tạo một IIFE (Immediately Invoked Function Expression) để thực hiện code ngay khi tải trang
 (async () => {
     // Danh sách đường dẫn đến thư mục ảnh nam và nữ
-    var directories = ['/assets/album/nam', '/assets/album/nu'];
+    var directories = ['./assets/album/nam', './assets/album/nu'];
 
     // Biến để lưu tổng số ảnh nam và nữ
     var male = 0;
