@@ -14,7 +14,6 @@
       align-items: center;
       height: 100vh;
       text-align: center;
-      padding: 10px; /* thêm padding để tránh sát mép màn hình */
     }
 
     .container {
@@ -22,22 +21,16 @@
       padding: 40px;
       border-radius: 12px;
       box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
-      max-width: 400px;
-      width: 100%;
-      box-sizing: border-box;
     }
 
     h2 {
       margin-top: 0;
       color: #222;
-      font-size: 1.8rem;
     }
 
     p {
       color: #555;
       margin: 20px 0;
-      font-size: 1rem;
-      line-height: 1.4;
     }
 
     .install-btn {
@@ -50,10 +43,6 @@
       cursor: pointer;
       transition: background-color 0.3s ease;
       box-shadow: 0 4px 10px rgba(0, 122, 255, 0.3);
-      width: 100%;
-      max-width: 300px;
-      display: block;
-      margin: 0 auto;
     }
 
     .install-btn:hover {
@@ -63,13 +52,12 @@
     .note {
       margin-top: 24px;
       color: #cc0000;
-      font-size: 0.9rem;
     }
 
     .author {
       margin-top: 30px;
       color: #888;
-      font-size: 0.9rem;
+      font-size: 14px;
     }
 
     .author a {
@@ -79,33 +67,6 @@
 
     .author a:hover {
       text-decoration: underline;
-    }
-
-    /* Responsive cho màn hình nhỏ */
-    @media screen and (max-width: 480px) {
-      .container {
-        padding: 20px;
-        max-width: 100%;
-      }
-
-      h2 {
-        font-size: 1.4rem;
-      }
-
-      p {
-        font-size: 0.95rem;
-      }
-
-      .install-btn {
-        font-size: 16px;
-        padding: 12px 20px;
-        max-width: 100%;
-      }
-
-      .note, .author {
-        font-size: 0.85rem;
-        margin-top: 20px;
-      }
     }
   </style>
 </head>
