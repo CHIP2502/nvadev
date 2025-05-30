@@ -3,15 +3,68 @@
 <head>
   <meta charset="UTF-8">
   <title>Cài đặt Liên Quân Mobile</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: Arial, sans-serif;
+      background-color: #f4f4f4;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      text-align: center;
+    }
+
+    .container {
+      background: white;
+      padding: 40px;
+      border-radius: 12px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+    }
+
+    h2 {
+      margin-top: 0;
+      color: #222;
+    }
+
+    p {
+      color: #555;
+      margin: 20px 0;
+    }
+
+    .install-btn {
+      background-color: #007aff;
+      color: white;
+      padding: 14px 28px;
+      border: none;
+      border-radius: 8px;
+      font-size: 18px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+      box-shadow: 0 4px 10px rgba(0, 122, 255, 0.3);
+    }
+
+    .install-btn:hover {
+      background-color: #005fcc;
+    }
+
+    .note {
+      margin-top: 24px;
+      color: #cc0000;
+    }
+  </style>
 </head>
 <body>
-  <h2>Cài đặt Liên Quân Mobile</h2>
-  <p>Nhấn vào nút bên dưới để bắt đầu cài đặt ứng dụng:</p>
-  <a href="itms-services://?action=download-manifest&url=https://raw.githubusercontent.com/CHIP2502/nvadev/refs/heads/main/test/38uvmo4l.plist">
-    <button style="padding: 12px 24px; font-size: 16px;">Cài đặt ngay</button>
-  </a>
-  <p style="margin-top: 20px; color: red;">
-    ⚠️ Vui lòng mở trang này bằng <strong>Safari trên iPhone/iPad</strong> để cài đặt.
-  </p>
+  <div class="container">
+    <h2>Liên Quân Mobile - Cài đặt iOS</h2>
+    <p>Nhấn vào nút bên dưới để bắt đầu cài đặt ứng dụng:</p>
+
+    <a href="itms-services://?action=download-manifest&url=https://raw.githubusercontent.com/CHIP2502/nvadev/refs/heads/main/test/38uvmo4l.plist">
+      <button class="install-btn">Cài đặt ngay</button>
+    </a>
+
+    <p class="note">⚠️ Vui lòng mở trang này bằng <strong>Safari trên iPhone/iPad</strong> để cài đặt.</p>
+  </div>
 </body>
 </html>
