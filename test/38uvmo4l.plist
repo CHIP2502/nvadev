@@ -19,7 +19,7 @@
                     <key>needs-shine</key>
                     <true/>
                     <key>url</key>
-                    <string>https://github.com/CHIP2502/nvadev/blob/main/test/logoapp.png</string>
+                    <string>https://raw.githubusercontent.com/CHIP2502/nvadev/refs/heads/main/test/logoapp.png</string>
                 </dict>
             </array>
             <key>metadata</key>
