@@ -11,6 +11,11 @@
       background-color: #f5e9e2;
       font-family: "Georgia", serif;
       color: #333;
+      transition: opacity 1s ease; /* hiệu ứng fade */
+    }
+
+    .fade-out {
+      opacity: 0;
     }
 
     .paper {
@@ -104,7 +109,7 @@ Và rồi, sau tất cả những yêu thương từng cháy bỏng, sau bao l�
 `;
 
     let i = 0;
-    const speed = 15; // tốc độ gõ
+    const speed = 15;
     const textDiv = document.getElementById("text");
     const signature = document.getElementById("signature");
 
@@ -114,12 +119,21 @@ Và rồi, sau tất cả những yêu thương từng cháy bỏng, sau bao l�
         i++;
         setTimeout(typeWriter, speed);
       } else {
-        // Gõ xong thì hiện chữ ký
         signature.classList.add("visible");
       }
     }
 
     window.onload = typeWriter;
+
+    document.addEventListener("click", function(e) {
+      const target = e.target;
+      if (!target.closest("a")) {
+        document.body.classList.add("fade-out");
+        setTimeout(() => {
+          window.location.href = "https://nguyenvanan.me";
+        }, 1000); // thời gian chờ khớp với CSS transition
+      }
+    });
   </script>
 </body>
 </html>
