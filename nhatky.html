@@ -23,6 +23,7 @@
       border: 1px solid #e0dcd5;
       line-height: 1.8;
       position: relative;
+      overflow: hidden;
     }
 
     .date {
@@ -34,14 +35,20 @@
       font-style: italic;
     }
 
-    p {
-      margin-bottom: 20px;
-      text-align: justify;
+    #text {
+      white-space: pre-wrap;
+      word-wrap: break-word;
     }
 
     .signature {
       text-align: right;
       margin-top: 50px;
+      opacity: 0;
+      transition: opacity 1s ease-in-out;
+    }
+
+    .signature.visible {
+      opacity: 1;
     }
 
     .signature a {
@@ -49,7 +56,6 @@
       font-size: 28px;
       color: #a75265;
       text-decoration: none;
-      transition: opacity 0.2s ease-in-out;
     }
 
     .signature a:hover {
@@ -77,20 +83,43 @@
 <body>
   <div class="paper">
     <div class="date">30/07/2025</div>
+    <div id="text"></div>
 
-    <p>Chúng ta đã từng là tất cả của nhau, từng là tin nhắn đầu tiên vào buổi sáng, là cuộc gọi cuối cùng trước khi chìm vào giấc ngủ. Những ngày tháng đó, anh là thói quen của em, và em là cả thế giới nhỏ bé của anh. Chúng ta đã từng hứa hẹn, từng vẽ ra viễn cảnh tương lai có nhau, từng nghĩ chẳng có gì có thể chia cắt được tình yêu này.</p>
-
-    <p>Thế nhưng, tình yêu, dù đẹp đến mấy, cũng không chống lại được hiện thực. Có lẽ chúng ta đã gặp nhau vào một thời điểm chưa đúng. Hoặc cũng có thế, chúng ta yêu chưa đủ trưởng thành để gìn giữ nhau giữa những lần giận hờn, những hiểu lầm không tên, và khoảng cách vô hình cứ ngày một lớn dần.</p>
-
-    <p>Chúng ta dần thay đổi, dần xa lạ ngay trong chính mối quan hệ từng rất thân quen. Những cuộc trò chuyện thưa dần, những lần im lặng nhiều hơn là quan tâm. Rồi một ngày, không ai nói lời chia tay, nhưng cả hai đều hiểu, đã đến lúc phải dừng lại.</p>
-
-    <p>Có những cuộc tình kết thúc không phải vì hết yêu, mà vì không còn đủ sức để ở lại. Không oán trách, không hối hận, chỉ còn những hoài niệm nhắc rằng đã từng có một người khiến tim mình rung động đến thế.</p>
-
-    <p>Và rồi, sau tất cả những yêu thương từng cháy bỏng, sau bao lần vun vén và cả những lần lặng lẽ rơi nước mắt vì nhau. Cuối cùng, mình trả nhau về vị trí ban đầu vốn có: em là em, anh là anh, hai kẻ xa lạ từng đi qua cuộc đời nhau với tư cách là một mối tình dang dở.</p>
-
-    <div class="signature">
-      <a href="https://nguyenvanan.me" target="_blank" rel="noopener noreferrer">Chip</a>
+    <div class="signature" id="signature">
+      <a href="https://nguyenvanan.me" target="_blank" rel="noopener noreferrer">— Chip</a>
     </div>
   </div>
+
+  <script>
+    const content = `
+Chúng ta đã từng là tất cả của nhau, từng là tin nhắn đầu tiên vào buổi sáng, là cuộc gọi cuối cùng trước khi chìm vào giấc ngủ. Những ngày tháng đó, anh là thói quen của em, và em là cả thế giới nhỏ bé của anh. Chúng ta đã từng hứa hẹn, từng vẽ ra viễn cảnh tương lai có nhau, từng nghĩ chẳng có gì có thể chia cắt được tình yêu này.
+
+Thế nhưng, tình yêu, dù đẹp đến mấy, cũng không chống lại được hiện thực. Có lẽ chúng ta đã gặp nhau vào một thời điểm chưa đúng. Hoặc cũng có thế, chúng ta yêu chưa đủ trưởng thành để gìn giữ nhau giữa những lần giận hờn, những hiểu lầm không tên, và khoảng cách vô hình cứ ngày một lớn dần.
+
+Chúng ta dần thay đổi, dần xa lạ ngay trong chính mối quan hệ từng rất thân quen. Những cuộc trò chuyện thưa dần, những lần im lặng nhiều hơn là quan tâm. Rồi một ngày, không ai nói lời chia tay, nhưng cả hai đều hiểu, đã đến lúc phải dừng lại.
+
+Có những cuộc tình kết thúc không phải vì hết yêu, mà vì không còn đủ sức để ở lại. Không oán trách, không hối hận, chỉ còn những hoài niệm nhắc rằng đã từng có một người khiến tim mình rung động đến thế.
+
+Và rồi, sau tất cả những yêu thương từng cháy bỏng, sau bao lần vun vén và cả những lần lặng lẽ rơi nước mắt vì nhau. Cuối cùng, mình trả nhau về vị trí ban đầu vốn có: em là em, anh là anh, hai kẻ xa lạ từng đi qua cuộc đời nhau với tư cách là một mối tình dang dở.
+`;
+
+    let i = 0;
+    const speed = 15; // tốc độ gõ
+    const textDiv = document.getElementById("text");
+    const signature = document.getElementById("signature");
+
+    function typeWriter() {
+      if (i < content.length) {
+        textDiv.innerHTML += content.charAt(i);
+        i++;
+        setTimeout(typeWriter, speed);
+      } else {
+        // Gõ xong thì hiện chữ ký
+        signature.classList.add("visible");
+      }
+    }
+
+    window.onload = typeWriter;
+  </script>
 </body>
 </html>
