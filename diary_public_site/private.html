@@ -1,0 +1,187 @@
+
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Private Diary Manager</title>
+  <style>
+    :root{ --bg:#0b0c0f; --panel:#12141a; --border:rgba(255,255,255,.08); --text:#e9eef5; --muted:#97a1ad; --accent:#4f8cff; --ok:#22c55e; --danger:#ef4444 }
+    @media (prefers-color-scheme: light){
+      :root{ --bg:#f6f7fb; --panel:#ffffff; --border:rgba(0,0,0,.08); --text:#0b1220; --muted:#606b76; --accent:#2563eb; --ok:#16a34a; --danger:#dc2626 }
+    }
+    *{box-sizing:border-box}
+    body{margin:0;background:var(--bg);color:var(--text);font:15px/1.6 system-ui,Segoe UI,Roboto,Arial}
+    header{position:sticky;top:0;background:color-mix(in oklab,var(--bg) 70%,transparent);border-bottom:1px solid var(--border);backdrop-filter:saturate(120%) blur(6px)}
+    .wrap{max-width:1080px;margin:auto;padding:16px}
+    h1{margin:0;font-size:20px}
+    .grid{display:grid;gap:16px}
+    @media(min-width:900px){.grid{grid-template-columns:420px 1fr}}
+
+    .card{background:var(--panel);border:1px solid var(--border);border-radius:16px;box-shadow:0 8px 24px rgba(0,0,0,.2)}
+    .card .hd{padding:12px 14px;border-bottom:1px solid var(--border);font-weight:700}
+    .card .bd{padding:14px 14px 18px}
+    label{display:block;font-size:12px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin:8px 0 6px}
+    input,select,textarea{width:100%;padding:10px 12px;border-radius:10px;border:1px solid var(--border);background:transparent;color:var(--text)}
+    textarea{min-height:140px;resize:vertical}
+    .row{display:flex;gap:10px}
+    .btns{display:flex;gap:10px;flex-wrap:wrap;margin-top:10px}
+    button{appearance:none;border:1px solid var(--border);background:color-mix(in oklab,var(--panel) 90%,transparent);color:var(--text);padding:10px 14px;border-radius:12px;cursor:pointer;font-weight:700}
+    .primary{background:var(--accent);color:white}
+    .ok{background:var(--ok);color:white}
+    .danger{background:var(--danger);color:white}
+    .muted{color:var(--muted);font-size:12px}
+    .list{display:grid;gap:12px}
+    .item{padding:12px;border:1px solid var(--border);border-radius:12px;background:color-mix(in oklab,var(--panel) 95%,transparent)}
+    .item h3{margin:0 0 6px;font-size:16px}
+    .tags{display:flex;gap:6px;flex-wrap:wrap}
+    .tag{font-size:11px;padding:4px 8px;border-radius:999px;border:1px solid var(--border);color:var(--muted)}
+  </style>
+</head>
+<body>
+  <header><div class="wrap"><h1>📓 Private Diary Manager</h1></div></header>
+  <main class="wrap grid">
+    <section class="card">
+      <div class="hd">Soạn / Sửa</div>
+      <div class="bd">
+        <form id="form">
+          <input type="hidden" id="id">
+          <div class="row">
+            <div style="flex:1">
+              <label>Ngày</label>
+              <input type="date" id="date" required>
+            </div>
+            <div style="flex:1">
+              <label>Cảm xúc</label>
+              <select id="mood">
+                <option value="">—</option>
+                <option>Vui</option><option>Buồn</option><option>Bình yên</option><option>Hào hứng</option><option>Mệt</option><option>Căng thẳng</option><option>Biết ơn</option>
+              </select>
+            </div>
+          </div>
+          <label>Tiêu đề</label>
+          <input id="title" placeholder="Hôm nay có gì?">
+          <label>Thẻ (phân tách bởi dấu phẩy)</label>
+          <input id="tags" placeholder="gia đình, công việc…">
+          <label>Nội dung</label>
+          <textarea id="content" placeholder="Viết gì đó..." required></textarea>
+          <div class="btns">
+            <button class="primary" type="submit">Lưu (Ctrl/⌘+S)</button>
+            <button type="reset">Làm mới</button>
+            <button id="del" class="danger" type="button" hidden>Xoá</button>
+          </div>
+        </form>
+      </div>
+    </section>
+
+    <section class="card">
+      <div class="hd">Danh sách riêng (Private)</div>
+      <div class="bd">
+        <div class="btns" style="margin-bottom:10px">
+          <button id="exportPublic" class="ok">Xuất JSON công khai (entries.json)</button>
+          <button id="viewPublic" onclick="window.open('public.html','_blank')">Xem trang Public</button>
+        </div>
+        <div id="list" class="list"></div>
+        <p class="muted">Gợi ý: Bấm “Đăng công khai” ở từng bài để đưa sang danh sách public. Sau đó bấm “Xuất JSON công khai”.</p>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    const kPrivate = "diary.privateEntries.v1";
+    const kPublic  = "diary.publicEntries.v1";
+
+    const $ = s => document.querySelector(s);
+    const state = { private: [], pub: [] };
+
+    function today(){return new Date().toISOString().slice(0,10)}
+    function uid(){ return Math.random().toString(36).slice(2)+Date.now().toString(36) }
+    function load(){
+      try{ state.private = JSON.parse(localStorage.getItem(kPrivate))||[] }catch{ state.private=[] }
+      try{ state.pub = JSON.parse(localStorage.getItem(kPublic))||[] }catch{ state.pub=[] }
+      render();
+    }
+    function save(){ localStorage.setItem(kPrivate, JSON.stringify(state.private)); localStorage.setItem(kPublic, JSON.stringify(state.pub)); }
+    function escapeHtml(s=''){return s.replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;','\'':'&#39;'}[c]))}
+
+    function clearForm(){
+      $("#id").value=''; $("#date").value=today(); $("#mood").value=''; $("#title").value=''; $("#tags").value=''; $("#content").value=''; $("#del").hidden=true;
+    }
+    function fillForm(e){
+      $("#id").value=e.id; $("#date").value=e.date; $("#mood").value=e.mood||''; $("#title").value=e.title||''; $("#tags").value=(e.tags||[]).join(', '); $("#content").value=e.content||''; $("#del").hidden=false;
+      scrollTo({top:0,behavior:'smooth'});
+    }
+    function normalizeEntryFromForm(){
+      const id = $("#id").value || uid();
+      const now = new Date().toISOString();
+      return {
+        id, date: $("#date").value || today(), mood: $("#mood").value || '',
+        title: $("#title").value.trim(), tags: $("#tags").value.split(',').map(s=>s.trim()).filter(Boolean),
+        content: $("#content").value.trim(), createdAt: $("#id").value? undefined : now, updatedAt: now
+      };
+    }
+    function upsert(entry){
+      const i = state.private.findIndex(x=>x.id===entry.id);
+      if(i>-1){ const prev=state.private[i]; state.private[i] = {...prev, ...entry, createdAt: prev.createdAt||entry.createdAt}; }
+      else state.private.push(entry);
+      save(); render(); clearForm();
+    }
+    function remove(id){ state.private = state.private.filter(x=>x.id!==id); save(); render(); clearForm(); }
+    function publish(id){
+      const e = state.private.find(x=>x.id===id);
+      if(!e) return;
+      const exists = state.pub.find(x=>x.id===id);
+      const pubEntry = {...e};
+      if(exists){ Object.assign(exists, pubEntry); }
+      else state.pub.push(pubEntry);
+      save(); render();
+      alert("Đã đưa vào danh sách công khai. Hãy bấm 'Xuất JSON công khai' để tạo entries.json!");
+    }
+
+    function render(){
+      const list = $("#list"); list.innerHTML='';
+      const sorted = state.private.slice().sort((a,b)=> (b.date+b.updatedAt).localeCompare(a.date+a.updatedAt));
+      if(sorted.length===0){ list.innerHTML='<div class="item muted">Chưa có bài nào.</div>'; return; }
+      for(const e of sorted){
+        const art = document.createElement('article'); art.className='item';
+        art.innerHTML = `
+          <h3>${escapeHtml(e.title||'(không tiêu đề)')}</h3>
+          <div class="muted">📅 ${e.date} ${e.mood? '· '+escapeHtml(e.mood):''}</div>
+          ${e.tags?.length? `<div class="tags">${e.tags.map(t=>`<span class="tag">#${escapeHtml(t)}</span>`).join('')}</div>`:''}
+          <div style="white-space:pre-wrap;margin-top:6px" class="muted">${escapeHtml(e.content).slice(0,200)}${e.content.length>200?'…':''}</div>
+          <div class="btns" style="margin-top:10px">
+            <button data-edit="${e.id}">Sửa</button>
+            <button data-del="${e.id}" class="danger">Xoá</button>
+            <button data-pub="${e.id}" class="ok">Đăng công khai</button>
+            <a href="view.html?id=${encodeURIComponent(e.id)}" target="_blank"><button>Xem kiểu giấy</button></a>
+          </div>
+        `;
+        list.appendChild(art);
+      }
+    }
+
+    // events
+    $("#form").addEventListener("submit", ev=>{ev.preventDefault(); const e=normalizeEntryFromForm(); if(!e.content){alert('Chưa có nội dung');return;} upsert(e);});
+    $("#del").addEventListener("click", ()=>{ const id=$("#id").value; if(id && confirm('Xoá mục này?')) remove(id); });
+    document.addEventListener("keydown", e=>{ if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='s'){ e.preventDefault(); $("#form").requestSubmit(); }});
+    $("#list").addEventListener("click", e=>{
+      const t = e.target.closest("button"); if(!t) return;
+      const id = t.dataset.edit || t.dataset.del || t.dataset.pub;
+      if(!id) return;
+      if(t.dataset.edit) fillForm(state.private.find(x=>x.id===id));
+      if(t.dataset.del && confirm("Xoá mục này?")) remove(id);
+      if(t.dataset.pub) publish(id);
+    });
+    document.getElementById("exportPublic").addEventListener("click", ()=>{
+      // Minimal public fields
+      const data = state.pub.slice().sort((a,b)=> (a.date).localeCompare(b.date));
+      const json = JSON.stringify(data, null, 2);
+      const blob = new Blob([json], {type:'application/json'});
+      const a = document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='entries.json'; a.click();
+      setTimeout(()=>URL.revokeObjectURL(a.href), 1000);
+    });
+
+    window.addEventListener("load", ()=>{ $("#date").value = today(); load(); });
+  </script>
+</body>
+</html>

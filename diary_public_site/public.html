@@ -1,0 +1,89 @@
+
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Nhật ký công khai</title>
+  <style>
+    body{margin:0;background:#f5e9e2;font:16px/1.7 Georgia, serif;color:#333}
+    header{padding:24px 16px;text-align:center}
+    h1{margin:0}
+    .wrap{max-width:900px;margin:0 auto;padding:0 16px 40px}
+    .tools{display:flex;gap:10px;flex-wrap:wrap;margin:10px 0 20px}
+    input,select{padding:10px 12px;border:1px solid #d8cfc7;border-radius:10px;background:#fffdf9}
+    .list{display:grid;gap:12px}
+    .item{background:#fffdf9;border:1px solid #e0dcd5;border-radius:10px;padding:14px;box-shadow:0 2px 10px rgba(0,0,0,.05)}
+    .item h3{margin:0 0 6px}
+    .muted{color:#777;font-size:14px}
+    .tags{display:flex;gap:6px;flex-wrap:wrap;margin-top:6px}
+    .tag{font-size:12px;border:1px solid #e0dcd5;border-radius:999px;padding:3px 8px;color:#777}
+    a.read{display:inline-block;margin-top:8px}
+    footer{padding:20px 0;text-align:center;color:#777}
+  </style>
+</head>
+<body>
+  <header><h1>📜 Nhật ký công khai</h1></header>
+  <div class="wrap">
+    <div class="tools">
+      <input id="q" placeholder="Tìm tiêu đề/nội dung/thẻ…">
+      <input id="from" type="date">
+      <input id="to" type="date">
+      <select id="sort">
+        <option value="newest">Mới nhất</option>
+        <option value="oldest">Cũ nhất</option>
+        <option value="title">A → Z</option>
+      </select>
+    </div>
+    <div id="list" class="list"></div>
+    <footer>Powered by entries.json · Cập nhật thủ công khi bạn xuất từ trang private</footer>
+  </div>
+
+  <script>
+    const $ = s => document.querySelector(s);
+    const state = { entries: [], filter:{q:'',from:'',to:'',sort:'newest'} };
+
+    function escapeHtml(s=''){return s.replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;','\'':'&#39;'}[c]))}
+    function matches(e){
+      const {q,from,to} = state.filter;
+      const text = ((e.title||'')+' '+(e.content||'')+' '+(e.tags||[]).join(' ')).toLowerCase();
+      if(q && !text.includes(q.toLowerCase())) return false;
+      if(from && e.date < from) return false;
+      if(to && e.date > to) return false;
+      return true;
+    }
+    function sortEntries(list){
+      const s=state.filter.sort;
+      if(s==='newest') return list.sort((a,b)=>(b.date+b.updatedAt).localeCompare(a.date+a.updatedAt||''));
+      if(s==='oldest') return list.sort((a,b)=>(a.date+a.updatedAt).localeCompare(b.date+b.updatedAt||''));
+      if(s==='title') return list.sort((a,b)=> (a.title||'').localeCompare(b.title||''));
+      return list;
+    }
+    function render(){
+      const box = $("#list"); box.innerHTML='';
+      const filtered = sortEntries(state.entries.filter(matches));
+      if(filtered.length===0){ box.innerHTML = '<div class="item muted">Chưa có mục nào.</div>'; return; }
+      for(const e of filtered){
+        const div = document.createElement('article'); div.className='item';
+        div.innerHTML = `
+          <h3>${escapeHtml(e.title||'(không tiêu đề)')}</h3>
+          <div class="muted">📅 ${e.date} ${e.mood? '· '+escapeHtml(e.mood):''}</div>
+          ${e.tags?.length? `<div class="tags">${e.tags.map(t=>`<span class='tag'>#${escapeHtml(t)}</span>`).join('')}</div>`:''}
+          <a class="read" href="view.html?id=${encodeURIComponent(e.id)}">Đọc</a>
+        `;
+        box.appendChild(div);
+      }
+    }
+
+    $("#q").addEventListener("input", e=>{state.filter.q = e.target.value; render();});
+    $("#from").addEventListener("change", e=>{state.filter.from = e.target.value; render();});
+    $("#to").addEventListener("change", e=>{state.filter.to = e.target.value; render();});
+    $("#sort").addEventListener("change", e=>{state.filter.sort = e.target.value; render();});
+
+    fetch('entries.json?_=' + Date.now())
+      .then(r=>r.json())
+      .then(data=>{ state.entries = Array.isArray(data)? data: []; render(); })
+      .catch(()=>{ document.getElementById('list').innerHTML = '<div class="item muted">Không thể tải entries.json</div>'; });
+  </script>
+</body>
+</html>

@@ -1,0 +1,113 @@
+
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <title>Nhật Ký</title>
+  <link href="https://fonts.googleapis.com/css2?family=Dancing+Script&display=swap" rel="stylesheet">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      background-color: #f5e9e2;
+      font-family: "Georgia", serif;
+      color: #333;
+      transition: opacity 1s ease; /* hiệu ứng fade */
+    }
+    .fade-out { opacity: 0; }
+    .paper {
+      max-width: 700px;
+      margin: 80px auto;
+      padding: 50px 60px;
+      background-color: #fffdf9;
+      box-shadow: 0 0 20px rgba(0, 0, 0, 0.15);
+      border-radius: 8px;
+      border: 1px solid #e0dcd5;
+      line-height: 1.8;
+      position: relative;
+      overflow: hidden;
+    }
+    .date {
+      position: absolute;
+      top: 20px;
+      left: 30px;
+      font-size: 15px;
+      color: #888;
+      font-style: italic;
+    }
+    #text { white-space: pre-wrap; word-wrap: break-word; }
+    .signature {
+      text-align: right;
+      margin-top: 50px;
+      opacity: 0;
+      transition: opacity 1s ease-in-out;
+    }
+    .signature.visible { opacity: 1; }
+    .signature a {
+      font-family: 'Dancing Script', cursive;
+      font-size: 28px;
+      color: #a75265;
+      text-decoration: none;
+    }
+    .signature a:hover { opacity: 0.7; }
+    .back { display:block; text-align:center; margin:20px auto; color:#7a4b52 }
+    @media (max-width: 768px) {
+      .paper { margin: 40px 20px; padding: 30px; }
+      .date { top: 10px; left: 20px; font-size: 14px; }
+      .signature a { font-size: 22px; }
+    }
+  </style>
+</head>
+<body>
+  <a class="back" href="public.html">← Danh mục</a>
+  <div class="paper">
+    <div class="date" id="date"></div>
+    <div id="text"></div>
+    <div class="signature" id="signature">
+      <!-- Sửa tên & link theo ý bạn -->
+      <a href="https://nguyenvanan.me" target="_blank" rel="noopener noreferrer">Chip</a>
+    </div>
+  </div>
+
+  <script>
+    function getParam(name){
+      const u = new URL(location.href); return u.searchParams.get(name);
+    }
+    const id = getParam('id');
+    const textDiv = document.getElementById('text');
+    const dateDiv = document.getElementById('date');
+    const signature = document.getElementById('signature');
+    const speed = 15;
+
+    function typeWriter(str){
+      let i=0;
+      const timer = setInterval(()=>{
+        if(i >= str.length){ clearInterval(timer); signature.classList.add('visible'); return; }
+        // Thêm ký tự an toàn (textNode) tránh chèn HTML
+        textDiv.appendChild(document.createTextNode(str.charAt(i)));
+        i++;
+      }, speed);
+    }
+
+    fetch('entries.json?_=' + Date.now())
+      .then(r=>r.json())
+      .then(list=>{
+        const e = (list||[]).find(x=>x.id===id);
+        if(!e){ textDiv.textContent = 'Không tìm thấy bài viết.'; return; }
+        dateDiv.textContent = e.date;
+        typeWriter(e.content || '');
+        document.title = e.title ? (e.title + ' – Nhật ký') : 'Nhật ký';
+      })
+      .catch(()=>{ textDiv.textContent = 'Không thể tải entries.json'; });
+
+    document.addEventListener('click', function(ev){
+      const target = ev.target;
+      if(!target.closest('a')){
+        document.body.classList.add('fade-out');
+        setTimeout(()=>{ window.location.href = 'public.html'; }, 1000);
+      }
+    });
+  </script>
+</body>
+</html>
