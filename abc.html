@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Nhật ký cá nhân</title>
+  <style>
+    :root{
+      --bg:#0b0c0f; --panel:#12141a; --muted:#8a8f98; --text:#e9eef5; --accent:#4f8cff; --accent-2:#22c55e; --danger:#ef4444;
+      --border:rgba(255,255,255,.08);
+    }
+    @media (prefers-color-scheme: light){
+      :root{ --bg:#f6f7fb; --panel:#ffffff; --muted:#65707c; --text:#0b1220; --accent:#2563eb; --accent-2:#16a34a; --danger:#dc2626; --border:rgba(0,0,0,.08); }
+    }
+    *{ box-sizing:border-box }
+    html,body{ height:100% }
+    body{
+      margin:0; font: 15px/1.5 system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial, "Noto Sans", "Apple Color Emoji", "Segoe UI Emoji";
+      background:var(--bg); color:var(--text);
+      display:flex; flex-direction:column;
+    }
+    header{
+      position:sticky; top:0; z-index:10; backdrop-filter:saturate(120%) blur(6px);
+      background:color-mix(in oklab, var(--bg) 70%, transparent);
+      border-bottom:1px solid var(--border);
+    }
+    .wrap{ max-width:1100px; margin:auto; padding:16px; }
+    h1{ margin:0; font-size:22px; letter-spacing:.3px }
+    .grid{ display:grid; gap:16px }
+    @media(min-width:900px){ .grid{ grid-template-columns: 420px 1fr } }
+
+    .card{ background:var(--panel); border:1px solid var(--border); border-radius:16px; box-shadow:0 8px 24px rgba(0,0,0,.18); }
+    .card .hd{ padding:14px 16px; border-bottom:1px solid var(--border); font-weight:600; }
+    .card .bd{ padding:16px }
+
+    label{ display:block; font-size:12px; text-transform:uppercase; letter-spacing:.06em; color:var(--muted); margin:10px 0 6px }
+    input[type="text"], input[type="date"], textarea, select{
+      width:100%; padding:10px 12px; border-radius:10px; border:1px solid var(--border); background:transparent; color:var(--text);
+      outline: none; box-shadow: inset 0 0 0 9999px color-mix(in oklab, var(--panel) 92%, transparent);
+    }
+    textarea{ min-height:140px; resize:vertical }
+
+    .row{ display:flex; gap:10px; align-items:center }
+    .row > *{ flex:1 }
+
+    .btns{ display:flex; gap:10px; flex-wrap:wrap; margin-top:12px }
+    button, .btn{
+      appearance:none; border:1px solid var(--border); background:color-mix(in oklab, var(--panel) 90%, transparent);
+      color:var(--text); padding:10px 14px; border-radius:12px; cursor:pointer; font-weight:600
+    }
+    .btn-primary{ background:var(--accent); border-color:color-mix(in oklab, var(--accent) 70%, black 20%); color:white }
+    .btn-success{ background:var(--accent-2); border-color:color-mix(in oklab, var(--accent-2) 70%, black 20%); color:white }
+    .btn-danger{ background:var(--danger); border-color:color-mix(in oklab, var(--danger) 70%, black 20%); color:white }
+    .btn-ghost{ background:transparent }
+
+    .tools{ display:flex; gap:10px; flex-wrap:wrap }
+    .tools input[type="text"]{ flex:1 }
+
+    .list{ display:grid; gap:12px; grid-auto-rows:min-content; }
+    .item{ padding:14px; border:1px solid var(--border); border-radius:12px; background:color-mix(in oklab, var(--panel) 95%, transparent); display:grid; gap:8px }
+    .item h3{ margin:0; font-size:16px }
+    .meta{ font-size:12px; color:var(--muted); display:flex; gap:8px; flex-wrap:wrap }
+    .tags{ display:flex; gap:6px; flex-wrap:wrap }
+    .tag{ font-size:11px; padding:4px 8px; border-radius:999px; border:1px solid var(--border); color:var(--muted) }
+    .preview{ color:var(--muted); max-height:3.6em; overflow:hidden }
+
+    .empty{ text-align:center; padding:30px; color:var(--muted); border:1px dashed var(--border); border-radius:12px }
+
+    .footer{ text-align:center; color:var(--muted); padding:20px 0 40px; font-size:13px }
+
+    .toggle{ margin-left:auto }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="wrap" style="display:flex; align-items:center; gap:12px">
+      <h1>📓 Nhật ký cá nhân</h1>
+      <button id="toggleTheme" class="btn btn-ghost toggle" title="Đổi giao diện">Đổi giao diện</button>
+    </div>
+  </header>
+
+  <main class="wrap grid">
+    <!-- Form nhập/sửa -->
+    <section class="card" aria-label="form">
+      <div class="hd">Ghi chép mới / Sửa</div>
+      <div class="bd">
+        <form id="entryForm">
+          <input type="hidden" id="entryId" />
+          <div class="row">
+            <div>
+              <label for="date">Ngày</label>
+              <input id="date" type="date" required />
+            </div>
+            <div>
+              <label for="mood">Cảm xúc</label>
+              <select id="mood">
+                <option value="">— chọn —</option>
+                <option>Vui</option>
+                <option>Buồn</option>
+                <option>Bình yên</option>
+                <option>Hào hứng</option>
+                <option>Mệt</option>
+                <option>Căng thẳng</option>
+                <option>Biết ơn</option>
+              </select>
+            </div>
+          </div>
+
+          <label for="title">Tiêu đề</label>
+          <input id="title" type="text" placeholder="Hôm nay có gì?" />
+
+          <label for="tags">Thẻ (ngăn cách bởi dấu phẩy)</label>
+          <input id="tags" type="text" placeholder="gia đình, công việc, sức khỏe…" />
+
+          <label for="content">Nội dung</label>
+          <textarea id="content" placeholder="Viết bất cứ điều gì bạn muốn ghi nhớ…" required></textarea>
+
+          <div class="btns">
+            <button class="btn btn-primary" type="submit">Lưu (Ctrl/⌘+S)</button>
+            <button id="resetBtn" class="btn" type="reset">Làm mới</button>
+            <button id="deleteBtn" class="btn btn-danger" type="button" hidden>Xoá mục này</button>
+          </div>
+        </form>
+      </div>
+    </section>
+
+    <!-- Danh sách + công cụ -->
+    <section class="card" aria-label="list">
+      <div class="hd">Mục đã lưu</div>
+      <div class="bd">
+        <div class="tools" style="margin-bottom:12px">
+          <input id="q" type="text" placeholder="Tìm theo tiêu đề/nội dung/thẻ…" />
+          <input id="from" type="date" />
+          <input id="to" type="date" />
+          <select id="sort">
+            <option value="newest">Mới nhất</option>
+            <option value="oldest">Cũ nhất</option>
+            <option value="title">A → Z</option>
+          </select>
+          <button id="clearFilter" class="btn">Xoá lọc</button>
+        </div>
+
+        <div class="btns" style="margin-bottom:14px">
+          <button id="exportJson" class="btn btn-success">Xuất JSON</button>
+          <button id="exportTxt" class="btn">Xuất TXT</button>
+          <label class="btn" for="importJson" style="cursor:pointer">Nhập JSON</label>
+          <input id="importJson" type="file" accept="application/json" style="display:none" />
+          <button id="printBtn" class="btn">In/ PDF</button>
+        </div>
+
+        <div id="list" class="list"></div>
+        <div id="empty" class="empty" hidden>Chưa có mục nào. Hãy viết dòng đầu tiên của bạn hôm nay! ✍️</div>
+      </div>
+    </section>
+  </main>
+
+  <div class="wrap footer">Dữ liệu được lưu cục bộ trên trình duyệt của bạn (LocalStorage). Không tải lên máy chủ nào.</div>
+
+  <script>
+    const $ = (s, p=document) => p.querySelector(s);
+    const $$ = (s, p=document) => Array.from(p.querySelectorAll(s));
+
+    const storeKey = 'diaryEntries.v1';
+    const themeKey = 'diaryTheme';
+
+    const state = {
+      entries: [],
+      filter: { q:'', from:'', to:'', sort:'newest' }
+    };
+
+    function today(){
+      const d = new Date();
+      return d.toISOString().slice(0,10);
+    }
+
+    function load(){
+      try{ state.entries = JSON.parse(localStorage.getItem(storeKey)) || [] }catch{ state.entries = [] }
+      const savedTheme = localStorage.getItem(themeKey);
+      if(savedTheme === 'light') document.documentElement.classList.add('light');
+      render();
+    }
+
+    function save(){
+      localStorage.setItem(storeKey, JSON.stringify(state.entries));
+    }
+
+    function uid(){ return Math.random().toString(36).slice(2) + Date.now().toString(36) }
+
+    function clearForm(){
+      $('#entryId').value = '';
+      $('#date').value = today();
+      $('#mood').value = '';
+      $('#title').value = '';
+      $('#tags').value = '';
+      $('#content').value = '';
+      $('#deleteBtn').hidden = true;
+    }
+
+    function fillForm(e){
+      $('#entryId').value = e.id;
+      $('#date').value = e.date;
+      $('#mood').value = e.mood || '';
+      $('#title').value = e.title || '';
+      $('#tags').value = (e.tags||[]).join(', ');
+      $('#content').value = e.content || '';
+      $('#deleteBtn').hidden = false;
+      window.scrollTo({ top:0, behavior:'smooth' });
+    }
+
+    function normalizeEntryFromForm(){
+      const id = $('#entryId').value || uid();
+      const now = new Date().toISOString();
+      const tags = $('#tags').value.split(',').map(s=>s.trim()).filter(Boolean);
+      return {
+        id,
+        date: $('#date').value || today(),
+        mood: $('#mood').value || '',
+        title: $('#title').value.trim(),
+        tags,
+        content: $('#content').value.trim(),
+        createdAt: $('#entryId').value ? undefined : now,
+        updatedAt: now
+      }
+    }
+
+    function upsert(entry){
+      const idx = state.entries.findIndex(x=>x.id===entry.id);
+      if(idx>-1){
+        const prev = state.entries[idx];
+        state.entries[idx] = { ...prev, ...entry, createdAt: prev.createdAt || entry.createdAt };
+      } else {
+        state.entries.push(entry);
+      }
+      save();
+      render();
+      clearForm();
+    }
+
+    function remove(id){
+      state.entries = state.entries.filter(x=>x.id!==id);
+      save();
+      render();
+      clearForm();
+    }
+
+    function matchesFilter(e){
+      const {q, from, to} = state.filter;
+      const text = (e.title+" "+e.content+" "+(e.tags||[]).join(' ')).toLowerCase();
+      if(q && !text.includes(q.toLowerCase())) return false;
+      if(from && e.date < from) return false;
+      if(to && e.date > to) return false;
+      return true;
+    }
+
+    function sortEntries(list){
+      const s = state.filter.sort;
+      if(s==='newest') return list.sort((a,b)=> (b.date+a.updatedAt.localeCompare(a.id)) .localeCompare(a.date+b.updatedAt));
+      if(s==='oldest') return list.sort((a,b)=> (a.date+a.updatedAt).localeCompare(b.date+b.updatedAt));
+      if(s==='title') return list.sort((a,b)=> (a.title||'').localeCompare(b.title||''));
+      return list;
+    }
+
+    function render(){
+      const container = $('#list');
+      container.innerHTML = '';
+      const filtered = sortEntries(state.entries.filter(matchesFilter));
+      $('#empty').hidden = filtered.length>0;
+      for(const e of filtered){
+        const el = document.createElement('article');
+        el.className = 'item';
+        el.innerHTML = `
+          <h3>${escapeHtml(e.title||'(không tiêu đề)')}</h3>
+          <div class="meta">
+            <span>📅 ${e.date}</span>
+            ${e.mood?`<span>🙂 ${escapeHtml(e.mood)}</span>`:''}
+          </div>
+          ${e.tags?.length?`<div class="tags">${e.tags.map(t=>`<span class='tag'>#${escapeHtml(t)}</span>`).join('')}</div>`:''}
+          <div class="preview">${escapeHtml(e.content)}</div>
+          <div class="btns">
+            <button class="btn btn-primary" data-edit="${e.id}">Sửa</button>
+            <button class="btn" data-view="${e.id}">Xem</button>
+            <button class="btn btn-danger" data-del="${e.id}">Xoá</button>
+          </div>
+        `;
+        container.appendChild(el);
+      }
+    }
+
+    function escapeHtml(s=''){
+      return s.replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;','\'':'&#39;'}[c]));
+    }
+
+    // Event listeners
+    $('#entryForm').addEventListener('submit', (ev)=>{
+      ev.preventDefault();
+      const entry = normalizeEntryFromForm();
+      if(!entry.content){ alert('Nội dung chưa có!'); return }
+      upsert(entry);
+    });
+
+    $('#resetBtn').addEventListener('click', ()=> clearForm());
+    $('#deleteBtn').addEventListener('click', ()=>{
+      const id = $('#entryId').value; if(!id) return;
+      if(confirm('Xoá mục này?')) remove(id);
+    });
+
+    // danh sách nút
+    $('#list').addEventListener('click', (e)=>{
+      const t = e.target;
+      const id = t.dataset.edit || t.dataset.del || t.dataset.view;
+      if(!id) return;
+      const entry = state.entries.find(x=>x.id===id);
+      if(!entry) return;
+      if(t.dataset.edit){ fillForm(entry); }
+      if(t.dataset.del){ if(confirm('Xoá mục này?')) remove(id); }
+      if(t.dataset.view){ openReader(entry); }
+    });
+
+    // Lọc & sắp xếp
+    $('#q').addEventListener('input', e=>{ state.filter.q = e.target.value; render(); });
+    $('#from').addEventListener('change', e=>{ state.filter.from = e.target.value; render(); });
+    $('#to').addEventListener('change', e=>{ state.filter.to = e.target.value; render(); });
+    $('#sort').addEventListener('change', e=>{ state.filter.sort = e.target.value; render(); });
+    $('#clearFilter').addEventListener('click', ()=>{
+      state.filter = { q:'', from:'', to:'', sort:$('#sort').value };
+      $('#q').value=''; $('#from').value=''; $('#to').value=''; render();
+    });
+
+    // Xuất/Nhập
+    $('#exportJson').addEventListener('click', ()=>{
+      const blob = new Blob([JSON.stringify(state.entries, null, 2)], {type:'application/json'});
+      download(blob, `nhat-ky-${new Date().toISOString().slice(0,10)}.json`);
+    });
+    $('#exportTxt').addEventListener('click', ()=>{
+      const lines = state.entries
+        .slice()
+        .sort((a,b)=> (a.date).localeCompare(b.date))
+        .map(e=>`=== ${e.date} | ${e.title||''} ${e.mood?('['+e.mood+']'):''}\n# ${e.tags?.join(', ')||''}\n${e.content}\n`)
+        .join('\n');
+      const blob = new Blob([lines], {type:'text/plain;charset=utf-8'});
+      download(blob, `nhat-ky-${new Date().toISOString().slice(0,10)}.txt`);
+    });
+    $('#importJson').addEventListener('change', async (ev)=>{
+      const f = ev.target.files?.[0]; if(!f) return;
+      const text = await f.text();
+      try{
+        const data = JSON.parse(text);
+        if(!Array.isArray(data)) throw new Error('Định dạng không đúng');
+        const byId = new Map(state.entries.map(e=>[e.id,e]));
+        for(const e of data){
+          if(!e.id) e.id = uid();
+          byId.set(e.id, {...byId.get(e.id), ...e});
+        }
+        state.entries = Array.from(byId.values());
+        save(); render();
+        alert('Nhập dữ liệu thành công!');
+      }catch(err){ alert('Không thể nhập: '+err.message) }
+      ev.target.value = '';
+    });
+
+    // In/PDF
+    $('#printBtn').addEventListener('click', ()=>{
+      openPrintAll();
+    });
+
+    function download(blob, filename){
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = filename; a.click();
+      setTimeout(()=> URL.revokeObjectURL(a.href), 1000);
+    }
+
+    // Trình đọc chi tiết
+    function openReader(entry){
+      const w = window.open('', '_blank');
+      if(!w){ alert('Hãy cho phép mở cửa sổ mới.'); return }
+      const html = `<!doctype html><meta charset="utf-8"><title>${escapeHtml(entry.title||'Nhật ký')}</title>
+        <style>
+          body{font:16px/1.6 system-ui; padding:28px; max-width:800px; margin:auto; color:#0b1220}
+          h1{margin:0 0 6px}
+          .muted{color:#606b76}
+          .tags{margin:10px 0; color:#606b76}
+          .content{white-space:pre-wrap; margin-top:12px}
+          @media print{ .actions{display:none} }
+        </style>
+        <div class="actions"><button onclick="print()">In/PDF</button></div>
+        <h1>${escapeHtml(entry.title||'(không tiêu đề)')}</h1>
+        <div class="muted">${entry.date}${entry.mood?` · ${escapeHtml(entry.mood)}`:''}</div>
+        ${entry.tags?.length?`<div class="tags"># ${entry.tags.map(t=>escapeHtml(t)).join(', ')}</div>`:''}
+        <div class="content">${escapeHtml(entry.content)}</div>`;
+      w.document.write(html);
+      w.document.close();
+    }
+
+    function openPrintAll(){
+      const html = `<!doctype html><meta charset="utf-8"><title>In nhật ký</title>
+        <style>
+          body{font:14px/1.6 system-ui; padding:28px; color:#0b1220}
+          h2{margin:24px 0 8px; border-bottom:1px solid #e5e7eb; padding-bottom:6px}
+          .entry{page-break-inside:avoid; white-space:pre-wrap}
+          .muted{color:#606b76; font-size:13px}
+        </style>
+        ${sortEntries(state.entries.slice()).map(e=>`
+          <section class="entry">
+            <h2>${escapeHtml(e.title||'(không tiêu đề)')}</h2>
+            <div class="muted">${e.date}${e.mood?` · ${escapeHtml(e.mood)}`:''} ${e.tags?.length?`· # ${e.tags.map(t=>escapeHtml(t)).join(', ')}`:''}</div>
+            <div>${escapeHtml(e.content)}</div>
+          </section>
+        `).join('')}`;
+      const w = window.open('', '_blank');
+      if(!w){ alert('Hãy cho phép mở cửa sổ mới.'); return }
+      w.document.write(html); w.document.close();
+    }
+
+    // Theme toggle
+    $('#toggleTheme').addEventListener('click', ()=>{
+      const isLight = document.documentElement.classList.toggle('light');
+      localStorage.setItem(themeKey, isLight? 'light':'dark');
+    });
+
+    // Phím tắt lưu
+    window.addEventListener('keydown', (e)=>{
+      if((e.ctrlKey||e.metaKey) && e.key.toLowerCase()==='s'){
+        e.preventDefault(); $('#entryForm').requestSubmit();
+      }
+    });
+
+    // Khởi tạo
+    window.addEventListener('load', ()=>{
+      $('#date').value = today();
+      load();
+    });
+  </script>
+</body>
+</html>
