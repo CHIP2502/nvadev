@@ -1,30 +1,101 @@
+/* Reset cơ bản */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
 body {
   font-family: Arial, sans-serif;
-  margin: 20px;
+  margin: 15px;
   background: #fdfdfd;
+  line-height: 1.5;
+  font-size: 16px;
+  color: #333;
 }
-h1 {
+
+h1, h2, h3 {
+  margin: 10px 0;
   text-align: center;
 }
-input, textarea {
+
+input, textarea, button, select {
   width: 100%;
-  margin: 5px 0;
-  padding: 8px;
+  margin: 6px 0;
+  padding: 10px;
+  font-size: 16px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
 }
+
+textarea {
+  min-height: 80px;
+  resize: vertical;
+}
+
 button {
   background: #4CAF50;
   color: white;
   border: none;
-  padding: 10px;
-  margin-top: 10px;
   cursor: pointer;
+  transition: background 0.3s;
 }
+
 button:hover {
   background: #45a049;
 }
+
 .entry {
-  background: #f0f0f0;
-  padding: 10px;
-  margin: 10px 0;
+  background: #f9f9f9;
+  border: 1px solid #ddd;
   border-radius: 6px;
+  padding: 12px;
+  margin: 10px 0;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+.entry h3 {
+  margin-bottom: 6px;
+  font-size: 18px;
+}
+
+.entry p {
+  margin-bottom: 6px;
+}
+
+.entry small {
+  color: #666;
+}
+
+.entry button {
+  width: auto;
+  margin-right: 5px;
+  margin-top: 8px;
+  font-size: 14px;
+  padding: 6px 10px;
+}
+
+/* Responsive cho mobile */
+@media (max-width: 600px) {
+  body {
+    margin: 10px;
+    font-size: 15px;
+  }
+
+  h1 {
+    font-size: 22px;
+  }
+
+  h2 {
+    font-size: 18px;
+  }
+
+  .entry {
+    padding: 10px;
+  }
+
+  button {
+    font-size: 15px;
+    padding: 8px;
+  }
 }
