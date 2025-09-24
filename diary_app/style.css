@@ -1,0 +1,30 @@
+body {
+  font-family: Arial, sans-serif;
+  margin: 20px;
+  background: #fdfdfd;
+}
+h1 {
+  text-align: center;
+}
+input, textarea {
+  width: 100%;
+  margin: 5px 0;
+  padding: 8px;
+}
+button {
+  background: #4CAF50;
+  color: white;
+  border: none;
+  padding: 10px;
+  margin-top: 10px;
+  cursor: pointer;
+}
+button:hover {
+  background: #45a049;
+}
+.entry {
+  background: #f0f0f0;
+  padding: 10px;
+  margin: 10px 0;
+  border-radius: 6px;
+}
