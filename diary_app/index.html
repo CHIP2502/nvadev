@@ -17,31 +17,44 @@
     <p id="login-msg"></p>
   </div>
 
-  <!-- Form viết nhật ký -->
+  <!-- Form viết / sửa nhật ký -->
   <div id="diary-section" style="display:none;">
-    <h2>✍️ Viết nhật ký</h2>
+    <h2 id="form-title">✍️ Viết nhật ký</h2>
     <input id="title" placeholder="Tiêu đề">
     <input id="emotion" placeholder="Cảm xúc (😊😢😡)">
     <input id="date" type="datetime-local">
     <textarea id="content" placeholder="Nội dung..."></textarea><br>
     <label><input type="checkbox" id="isPublic"> Đăng công khai</label><br>
-    <button onclick="saveEntry()">Lưu nhật ký</button>
+    <button onclick="saveEntry()">💾 Lưu</button>
+    <button id="cancel-edit" onclick="cancelEdit()" style="display:none;">❌ Hủy</button>
     <p id="save-msg"></p>
+
+    <hr>
+    <h2>🔍 Tìm kiếm / Lọc nhật ký</h2>
+    <input id="searchKeyword" placeholder="Từ khóa...">
+    <br>
+    Từ ngày: <input type="date" id="fromDate">
+    Đến ngày: <input type="date" id="toDate"><br>
+    Cảm xúc: <input id="filterEmotion" placeholder="😊, 😢, 😡...">
+    <button onclick="applyFilter()">Lọc</button>
+    <button onclick="clearFilter()">Xóa lọc</button>
 
     <hr>
     <h2>📖 Nhật ký của tôi</h2>
     <div id="my-entries"></div>
 
     <hr>
-    <a href="public.html">📢 Xem nhật ký công khai</a>
+    <a href="public.html">📢 Xem nhật ký công khai</a> | 
+    <button onclick="logout()">🚪 Đăng xuất</button>
   </div>
 
   <script>
     const users = [
-      {username: "zaara", password: "Nguyenan2502@"},
-      {username: "changbi", password: "Cun030406@"}
+      {username: "user1", password: "123"},
+      {username: "user2", password: "456"}
     ];
     let currentUser = null;
+    let editId = null; // ID bài đang sửa
 
     function login(){
       const u = document.getElementById("username").value;
@@ -49,6 +62,7 @@
       const valid = users.find(x => x.username===u && x.password===p);
       if(valid){
         currentUser = u;
+        localStorage.setItem("currentUser", currentUser);
         document.getElementById("login-section").style.display="none";
         document.getElementById("diary-section").style.display="block";
         loadMyEntries();
@@ -57,43 +71,150 @@
       }
     }
 
+    function logout(){
+      currentUser = null;
+      localStorage.removeItem("currentUser");
+      document.getElementById("login-section").style.display="block";
+      document.getElementById("diary-section").style.display="none";
+    }
+
     function saveEntry(){
       if(!currentUser) return;
-      const entry = {
-        user: currentUser,
-        title: document.getElementById("title").value,
-        emotion: document.getElementById("emotion").value,
-        date: document.getElementById("date").value,
-        content: document.getElementById("content").value,
-        isPublic: document.getElementById("isPublic").checked
-      };
       let entries = JSON.parse(localStorage.getItem("diaryEntries")||"[]");
-      entries.push(entry);
+
+      if(editId){ 
+        let idx = entries.findIndex(e => e.id===editId && e.user===currentUser);
+        if(idx>-1){
+          entries[idx].title = document.getElementById("title").value;
+          entries[idx].emotion = document.getElementById("emotion").value;
+          entries[idx].date = document.getElementById("date").value;
+          entries[idx].content = document.getElementById("content").value;
+          entries[idx].isPublic = document.getElementById("isPublic").checked;
+        }
+        editId = null;
+        document.getElementById("form-title").innerText="✍️ Viết nhật ký";
+        document.getElementById("cancel-edit").style.display="none";
+      } else {
+        const entry = {
+          id: Date.now(),
+          user: currentUser,
+          title: document.getElementById("title").value,
+          emotion: document.getElementById("emotion").value,
+          date: document.getElementById("date").value,
+          content: document.getElementById("content").value,
+          isPublic: document.getElementById("isPublic").checked
+        };
+        entries.push(entry);
+      }
+
       localStorage.setItem("diaryEntries", JSON.stringify(entries));
       document.getElementById("save-msg").innerText="✅ Đã lưu!";
+      clearForm();
       loadMyEntries();
     }
 
-    function loadMyEntries(){
+    function loadMyEntries(filteredList=null){
       let entries = JSON.parse(localStorage.getItem("diaryEntries")||"[]");
       let myEntries = entries.filter(e => e.user === currentUser);
+      if(filteredList) myEntries = filteredList;
+
       const container = document.getElementById("my-entries");
       container.innerHTML="";
       if(myEntries.length===0){
-        container.innerHTML="<p>Chưa có nhật ký nào.</p>";
+        container.innerHTML="<p>Không có nhật ký nào.</p>";
         return;
       }
-      myEntries.forEach(e=>{
+      myEntries.reverse().forEach(e=>{
         const div=document.createElement("div");
         div.className="entry";
         div.innerHTML=`
           <h3>${e.title} (${e.emotion})</h3>
           <p><b>Ngày:</b> ${e.date}</p>
           <p>${e.content}</p>
-          <small>${e.isPublic?"🌍 Công khai":"🔒 Riêng tư"}</small>
+          <small>${e.isPublic?"🌍 Công khai":"🔒 Riêng tư"}</small><br>
+          <button onclick="editEntry(${e.id})">✏️ Sửa</button>
+          <button onclick="deleteEntry(${e.id})">🗑️ Xóa</button>
         `;
         container.appendChild(div);
       });
+    }
+
+    function editEntry(id){
+      let entries = JSON.parse(localStorage.getItem("diaryEntries")||"[]");
+      let e = entries.find(x => x.id===id && x.user===currentUser);
+      if(!e) return;
+      editId = id;
+      document.getElementById("form-title").innerText="✏️ Sửa nhật ký";
+      document.getElementById("cancel-edit").style.display="inline";
+      document.getElementById("title").value = e.title;
+      document.getElementById("emotion").value = e.emotion;
+      document.getElementById("date").value = e.date;
+      document.getElementById("content").value = e.content;
+      document.getElementById("isPublic").checked = e.isPublic;
+    }
+
+    function cancelEdit(){
+      editId = null;
+      clearForm();
+      document.getElementById("form-title").innerText="✍️ Viết nhật ký";
+      document.getElementById("cancel-edit").style.display="none";
+    }
+
+    function deleteEntry(id){
+      if(!confirm("Bạn có chắc muốn xóa nhật ký này?")) return;
+      let entries = JSON.parse(localStorage.getItem("diaryEntries")||"[]");
+      entries = entries.filter(e => !(e.id===id && e.user===currentUser));
+      localStorage.setItem("diaryEntries", JSON.stringify(entries));
+      loadMyEntries();
+    }
+
+    function clearForm(){
+      document.getElementById("title").value="";
+      document.getElementById("emotion").value="";
+      document.getElementById("date").value="";
+      document.getElementById("content").value="";
+      document.getElementById("isPublic").checked=false;
+    }
+
+    // ---- Bộ lọc ----
+    function applyFilter(){
+      let entries = JSON.parse(localStorage.getItem("diaryEntries")||"[]");
+      let myEntries = entries.filter(e => e.user === currentUser);
+
+      const keyword = document.getElementById("searchKeyword").value.toLowerCase();
+      const fromDate = document.getElementById("fromDate").value;
+      const toDate = document.getElementById("toDate").value;
+      const emo = document.getElementById("filterEmotion").value.trim();
+
+      let filtered = myEntries.filter(e=>{
+        let matchKeyword = !keyword || (e.title.toLowerCase().includes(keyword) || e.content.toLowerCase().includes(keyword));
+        let matchDate = true;
+        if(fromDate && e.date < fromDate) matchDate=false;
+        if(toDate && e.date > toDate+"T23:59") matchDate=false;
+        let matchEmotion = !emo || e.emotion.includes(emo);
+        return matchKeyword && matchDate && matchEmotion;
+      });
+
+      loadMyEntries(filtered);
+    }
+
+    function clearFilter(){
+      document.getElementById("searchKeyword").value="";
+      document.getElementById("fromDate").value="";
+      document.getElementById("toDate").value="";
+      document.getElementById("filterEmotion").value="";
+      loadMyEntries();
+    }
+
+    // Auto login nếu trước đó chưa logout
+    window.onload = ()=>{
+      let u = localStorage.getItem("currentUser");
+      if(u){
+        currentUser = u;
+        document.getElementById("login-section").style.display="none";
+        document.getElementById("diary-section").style.display="block";
+        loadMyEntries();
+      }
     }
   </script>
 </body>
