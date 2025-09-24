@@ -5,6 +5,7 @@
   padding: 0;
 }
 
+/* Light mode mặc định */
 body {
   font-family: Arial, sans-serif;
   margin: 15px;
@@ -98,4 +99,46 @@ button:hover {
     font-size: 15px;
     padding: 8px;
   }
+}
+
+/* ================= DARK MODE ================= */
+
+/* Dark Mode tự động theo hệ thống */
+@media (prefers-color-scheme: dark) {
+  body {
+    background: #121212;
+    color: #eee;
+  }
+  .entry {
+    background: #1e1e1e;
+    border-color: #333;
+  }
+  input, textarea, select {
+    background: #222;
+    color: #eee;
+    border: 1px solid #444;
+  }
+  button {
+    background: #388e3c;
+  }
+}
+
+/* Dark Mode thủ công (ép buộc) */
+body.dark-mode {
+  background: #121212;
+  color: #eee;
+}
+body.dark-mode .entry {
+  background: #1e1e1e;
+  border-color: #333;
+}
+body.dark-mode input,
+body.dark-mode textarea,
+body.dark-mode select {
+  background: #222;
+  color: #eee;
+  border: 1px solid #444;
+}
+body.dark-mode button {
+  background: #388e3c;
 }
