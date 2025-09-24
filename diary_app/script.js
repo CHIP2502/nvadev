@@ -1,186 +1,153 @@
-// ========== CẤU HÌNH NGƯỜI DÙNG ==========
-const users = [
-  { username: "user1", password: "123" },
-  { username: "user2", password: "123" }
-];
-
-let currentUser = null;
-let entries = JSON.parse(localStorage.getItem("entries")) || [];
-
-// ========== DARK MODE ==========
+// Dark mode toggle
 function toggleDarkMode() {
   document.body.classList.toggle("dark-mode");
-
-  if (document.body.classList.contains("dark-mode")) {
-    localStorage.setItem("darkMode", "on");
-  } else {
-    localStorage.setItem("darkMode", "off");
-  }
+  localStorage.setItem("darkMode", document.body.classList.contains("dark-mode") ? "on" : "off");
 }
+if (localStorage.getItem("darkMode") === "on") document.body.classList.add("dark-mode");
 
-window.onload = function () {
-  if (localStorage.getItem("darkMode") === "on") {
-    document.body.classList.add("dark-mode");
-  }
-  render();
-};
+// Users
+const users = ["An", "Binh"];
+let currentUser = null;
 
-// ========== RENDER GIAO DIỆN ==========
-function render() {
+// Data
+let entries = JSON.parse(localStorage.getItem("entries")) || [];
+
+// Render login
+function renderLogin() {
   const app = document.getElementById("app");
-  app.innerHTML = "";
-
-  if (!currentUser) {
-    renderLogin(app);
-  } else {
-    renderDiary(app);
-  }
-}
-
-// ========== FORM ĐĂNG NHẬP ==========
-function renderLogin(app) {
-  const loginForm = document.createElement("div");
-  loginForm.innerHTML = `
-    <h2>🔑 Đăng nhập</h2>
-    <input type="text" id="username" placeholder="Tên đăng nhập">
-    <input type="password" id="password" placeholder="Mật khẩu">
-    <button onclick="login()">Đăng nhập</button>
+  app.innerHTML = `
+    <form onsubmit="login(event)">
+      <h2>🔑 Đăng nhập</h2>
+      <select id="username">
+        ${users.map(u => `<option value="${u}">${u}</option>`).join("")}
+      </select>
+      <button type="submit">Đăng nhập</button>
+    </form>
   `;
-  app.appendChild(loginForm);
 }
 
-function login() {
-  const username = document.getElementById("username").value.trim();
-  const password = document.getElementById("password").value.trim();
-
-  const user = users.find(u => u.username === username && u.password === password);
-
-  if (user) {
-    currentUser = user.username;
-    render();
-  } else {
-    alert("Sai tên đăng nhập hoặc mật khẩu!");
-  }
+// Handle login
+function login(e) {
+  e.preventDefault();
+  currentUser = document.getElementById("username").value;
+  renderApp();
 }
 
-function logout() {
-  currentUser = null;
-  render();
-}
-
-// ========== GIAO DIỆN NHẬT KÝ ==========
-function renderDiary(app) {
-  const diary = document.createElement("div");
-
-  diary.innerHTML = `
-    <h2>Xin chào, ${currentUser}!</h2>
-    <button onclick="logout()" style="margin-bottom:15px;">🚪 Đăng xuất</button>
-
-    <h3>✍️ Viết nhật ký</h3>
-    <input type="text" id="title" placeholder="Tiêu đề">
-    <input type="text" id="feeling" placeholder="Cảm xúc">
-    <input type="datetime-local" id="date">
-    <textarea id="content" placeholder="Nội dung..."></textarea>
-    <label>
-      <input type="checkbox" id="public"> Công khai
-    </label>
-    <button onclick="addEntry()">Lưu nhật ký</button>
-
-    <h3>📌 Nhật ký của bạn</h3>
-    <div id="myEntries"></div>
-
-    <h3>🌍 Nhật ký công khai</h3>
-    <div id="publicEntries"></div>
+// Render app
+function renderApp() {
+  const app = document.getElementById("app");
+  app.innerHTML = `
+    <form onsubmit="addEntry(event)">
+      <h2>✍️ Viết nhật ký</h2>
+      <input type="text" id="title" placeholder="Tiêu đề" required>
+      <input type="text" id="feeling" placeholder="Cảm xúc">
+      <textarea id="content" placeholder="Nội dung..." required></textarea>
+      <label><input type="checkbox" id="isPublic"> Đăng công khai</label>
+      <button type="submit">Lưu</button>
+    </form>
+    <h2>📌 Nhật ký của bạn</h2>
+    <div id="entries"></div>
   `;
-
-  app.appendChild(diary);
   renderEntries();
 }
 
-// ========== QUẢN LÝ BÀI VIẾT ==========
-function addEntry() {
-  const title = document.getElementById("title").value.trim();
-  const feeling = document.getElementById("feeling").value.trim();
-  const date = document.getElementById("date").value;
-  const content = document.getElementById("content").value.trim();
-  const isPublic = document.getElementById("public").checked;
-
-  if (!title || !content || !date) {
-    alert("Vui lòng nhập đủ tiêu đề, nội dung và ngày giờ!");
-    return;
-  }
-
-  entries.push({
+// Add entry
+function addEntry(e) {
+  e.preventDefault();
+  const entry = {
     id: Date.now(),
     user: currentUser,
-    title,
-    feeling,
-    date,
-    content,
-    public: isPublic
-  });
-
+    title: document.getElementById("title").value,
+    feeling: document.getElementById("feeling").value,
+    content: document.getElementById("content").value,
+    public: document.getElementById("isPublic").checked,
+    date: new Date().toISOString()
+  };
+  entries.push(entry);
   saveEntries();
-  render();
+  renderEntries();
+  e.target.reset();
 }
 
+// Save
+function saveEntries() {
+  localStorage.setItem("entries", JSON.stringify(entries));
+}
+
+// Render entries
 function renderEntries() {
-  const myEntriesDiv = document.getElementById("myEntries");
-  const publicEntriesDiv = document.getElementById("publicEntries");
+  const container = document.getElementById("entries");
+  if (!container) return;
+  container.innerHTML = "";
+  entries.filter(e => e.user === currentUser).forEach(e => {
+    const div = document.createElement("div");
+    div.className = "entry";
+    div.innerHTML = `
+      <h3>${e.title}</h3>
+      <p>😃 ${e.feeling || "Không có"}</p>
+      <p>${e.content}</p>
+      <small>🗓 ${new Date(e.date).toLocaleString()}</small><br>
+      <button onclick="editEntry(${e.id})">✏️ Sửa</button>
+      <button onclick="deleteEntry(${e.id})">🗑 Xoá</button>
+    `;
+    container.appendChild(div);
+  });
+}
 
-  myEntriesDiv.innerHTML = "";
-  publicEntriesDiv.innerHTML = "";
+// Delete entry
+function deleteEntry(id) {
+  entries = entries.filter(e => e.id !== id);
+  saveEntries();
+  renderEntries();
+}
 
-  entries
-    .filter(e => e.user === currentUser)
-    .forEach(e => {
-      const div = document.createElement("div");
-      div.className = "entry";
+// Edit entry
+function editEntry(id) {
+  const container = document.getElementById("entries");
+  const entry = entries.find(e => e.id === id);
+  if (!entry) return;
+  container.innerHTML = "";
+  entries.filter(e => e.user === currentUser).forEach(e => {
+    const div = document.createElement("div");
+    div.className = "entry";
+    if (e.id === id) {
+      div.innerHTML = `
+        <form onsubmit="updateEntry(event, ${id})">
+          <input type="text" id="edit-title-${id}" value="${e.title}" required>
+          <input type="text" id="edit-feeling-${id}" value="${e.feeling}">
+          <textarea id="edit-content-${id}" required>${e.content}</textarea>
+          <label><input type="checkbox" id="edit-public-${id}" ${e.public ? "checked" : ""}> Công khai</label>
+          <button type="submit">💾 Lưu</button>
+          <button type="button" onclick="renderEntries()">❌ Huỷ</button>
+        </form>
+      `;
+    } else {
       div.innerHTML = `
         <h3>${e.title}</h3>
-        <p>😃 ${e.feeling || "Không có"} </p>
+        <p>😃 ${e.feeling || "Không có"}</p>
         <p>${e.content}</p>
         <small>🗓 ${new Date(e.date).toLocaleString()}</small><br>
         <button onclick="editEntry(${e.id})">✏️ Sửa</button>
         <button onclick="deleteEntry(${e.id})">🗑 Xoá</button>
       `;
-      myEntriesDiv.appendChild(div);
-    });
-
-  entries
-    .filter(e => e.public)
-    .forEach(e => {
-      const div = document.createElement("div");
-      div.className = "entry";
-      div.innerHTML = `
-        <h3>${e.title}</h3>
-        <p>😃 ${e.feeling || "Không có"} </p>
-        <p>${e.content}</p>
-        <small>👤 ${e.user} | 🗓 ${new Date(e.date).toLocaleString()}</small>
-      `;
-      publicEntriesDiv.appendChild(div);
-    });
+    }
+    container.appendChild(div);
+  });
 }
 
-function editEntry(id) {
-  const entry = entries.find(e => e.id === id);
-  if (!entry) return;
-
-  document.getElementById("title").value = entry.title;
-  document.getElementById("feeling").value = entry.feeling;
-  document.getElementById("date").value = entry.date;
-  document.getElementById("content").value = entry.content;
-  document.getElementById("public").checked = entry.public;
-
-  deleteEntry(id);
+// Update entry
+function updateEntry(e, id) {
+  e.preventDefault();
+  const entry = entries.find(ent => ent.id === id);
+  if (entry) {
+    entry.title = document.getElementById(`edit-title-${id}`).value;
+    entry.feeling = document.getElementById(`edit-feeling-${id}`).value;
+    entry.content = document.getElementById(`edit-content-${id}`).value;
+    entry.public = document.getElementById(`edit-public-${id}`).checked;
+    saveEntries();
+    renderEntries();
+  }
 }
 
-function deleteEntry(id) {
-  entries = entries.filter(e => e.id !== id);
-  saveEntries();
-  render();
-}
-
-function saveEntries() {
-  localStorage.setItem("entries", JSON.stringify(entries));
-}
+// Start
+renderLogin();
