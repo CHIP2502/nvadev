@@ -1,0 +1,292 @@
+
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+  <meta name="theme-color" content="#0f1226" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <title>CÀI APP KHÔNG CẦN LOG APPSTORE</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --panel:#0f1528cc;--text:#e8ecff;--muted:#a7b0d8;--brand:#7c5cff;--brand2:#0fd;--line:#ffffff18;--r:14px;
+      --bg1:#0a0d1a; --bg2:#0b0f1c; --bg3:#0d0f23
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{margin:0;font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;color:var(--text);
+      background: linear-gradient(160deg, var(--bg1), var(--bg2) 40%, var(--bg3));
+      overflow:hidden}
+
+    /* ===== Background FX (GPU only) ===== */
+    .bgfx{position:fixed;inset:0;pointer-events:none;z-index:0;contain:layout paint size}
+    .aurora{position:absolute;width:120vmax;height:120vmax;border-radius:50%;opacity:.25;will-change:transform}
+    .a1{left:-20vmax;top:-30vmax;background:radial-gradient(closest-side, rgba(124,92,255,.35), transparent 70%)}
+    .a2{right:-25vmax;bottom:-35vmax;background:radial-gradient(closest-side, rgba(0,255,213,.35), transparent 70%)}
+
+    .stars{position:fixed;inset:0;pointer-events:none;z-index:0}
+    .star{position:absolute;width:2px;height:2px;background:#fff3;border-radius:50%;animation:twinkle 6s linear infinite}
+    @keyframes twinkle{0%,100%{opacity:.08;transform:translateY(0)}50%{opacity:.9;transform:translateY(-3px)}}
+
+    /* ===== Layout ===== */
+    .wrap{min-height:100%;display:grid;place-items:center;padding:env(safe-area-inset-top) 12px env(safe-area-inset-bottom) 12px;position:relative;z-index:1}
+    .hint-top{margin-bottom:10px;display:inline-flex;align-items:center;gap:8px;padding:6px 12px;border-radius:999px;background:#0e1335cc;border:1px solid #ffffff1a;font-size:13px;color:#cfe5ff}
+
+    .stage{position:relative;width:min(94vw,420px);height:calc(100dvh - env(safe-area-inset-top) - env(safe-area-inset-bottom) - 28px);max-height:100svh;perspective:1000px;overflow:hidden;touch-action:none;contain:layout paint size}
+
+    .card{position:absolute;inset:0;background:var(--panel);border:1px solid var(--line);border-radius:var(--r);display:grid;place-items:center;padding:18px;text-align:center;will-change:transform;box-shadow:0 10px 24px rgba(0,0,0,.35), inset 0 1px 0 rgba(255,255,255,.04);backface-visibility:hidden}
+    .card::before{content:"";position:absolute;inset:0;border-radius:inherit;padding:1px;background:linear-gradient(135deg,var(--brand),var(--brand2));-webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask-composite:exclude;opacity:.5;pointer-events:none}
+
+    /* ===== Animated Logo (ring + custom image inside) ===== */
+    .logo{width:56px;height:56px;display:grid;place-items:center;position:relative}
+    .logo .ring{position:absolute;inset:0;border-radius:16px;padding:5px;background:conic-gradient(from 0deg,#7c5cff,#0fd,#7c5cff);-webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask-composite:exclude;animation:spin 9s linear infinite}
+    .logo .core{width:68%;height:68%;border-radius:14px;overflow:hidden;background:linear-gradient(135deg,#7c5cff,#0fd);box-shadow:0 10px 20px rgba(0,0,0,.25);animation:float 5s ease-in-out infinite}
+    .logo .core img{width:100%;height:100%;object-fit:cover;display:block}
+    @keyframes spin{to{transform:rotate(360deg)}}
+    @keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
+
+    h1{margin:10px 0 0;font-size:clamp(16px,5vw,22px)}
+    .sub{color:var(--muted);margin:6px 0 14px;font-size:13px}
+
+    .btn{position:relative;border:none;border-radius:12px;padding:11px 14px;font-weight:700;letter-spacing:.2px;cursor:pointer;transition:transform .15s; color:#0a0d1a;background:linear-gradient(135deg,var(--brand),var(--brand2));box-shadow:0 6px 16px rgba(0,0,0,.35);font-size:13px}
+
+    /* Decor chips */
+    .chips{display:flex;gap:8px;justify-content:center;margin:6px 0 12px}
+    .chip{padding:6px 10px;border-radius:999px;border:1px solid #ffffff22;background:#10163acc;color:#cfe5ff;font-size:12px}
+
+    /* Full-screen overlay on top of cards */
+    .overlay{position:fixed;inset:0;pointer-events:none;z-index:5}
+    .vg{position:absolute;left:0;right:0;height:40vh;opacity:0;transition:opacity .2s;}
+    .vg.top{top:0;background:linear-gradient(to bottom, rgba(0,0,0,.6), rgba(0,0,0,0) 70%)}
+    .vg.bottom{bottom:0;background:linear-gradient(to top, rgba(0,0,0,.6), rgba(0,0,0,0) 70%)}
+
+    .pane-a{z-index:2}
+    .pane-b{z-index:1}
+    .animate .card{transition:transform .35s cubic-bezier(.22,.8,.24,1)}
+
+    @media (prefers-reduced-motion: reduce){
+      .star{animation:none}
+      .logo .ring,.logo .core{animation:none}
+      .animate .card{transition:none}
+    }
+     .notice-inline{
+  display:block;
+  background: linear-gradient(90deg, #ff0000, #ff6600, #ff0000);
+  background-size: 600% 600%;
+  animation: bgflow 5s linear infinite, blink 1.3s ease-in-out infinite;
+  will-change: background-position, color;
+  color:#ffeb3b;
+  padding:14px;
+  font-size:15px;
+  font-weight:700;
+  font-family:"Arial",sans-serif;
+  text-align:center;
+  border:2px solid #000;
+  border-radius:10px;
+  box-shadow:0 0 12px rgba(0,0,0,.5);
+  text-transform:uppercase;
+  letter-spacing:1px;
+  line-height:1.6;
+  margin-top:15px;
+}
+
+@keyframes bgflow {
+  0%   { background-position: 0% 50%; }
+  50%  { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+@keyframes blink {
+  0%,100% { color:#ffeb3b; text-shadow:0 0 8px rgba(255,235,59,.5); }
+  50%     { color:#ffffff; text-shadow:0 0 12px rgba(255,255,255,.8); }
+}   
+  </style>
+</head>
+<body>
+    
+  <div class="bgfx" aria-hidden="true">
+    <div class="aurora a1" id="a1"></div>
+    <div class="aurora a2" id="a2"></div>
+  </div>
+  <div class="stars" aria-hidden="true" id="stars"></div>
+
+  <div class="wrap">
+    <div class="hint-top">⬆️ Vuốt Lên/Xuống ⬇️</div>
+    <div class="stage animate" id="stage">
+      <section class="card pane-a" id="paneA">
+        <div>
+          <div class="logo" aria-hidden="true">
+            <div class="ring"></div>
+            <div class="core" id="logoA"><img src="https://dl-image.3u.com/icon/2025/09/22/1600525061/1758492569568_755757.jpg" alt="" loading="lazy" decoding="async" referrerpolicy="no-referrer"></div>
+          </div>
+          <h1>Locket 2.8.0</h1>
+          <div class="chips">
+            <span class="chip">📷 Picture</span>
+            <span class="chip">iOS 12+</span>
+          </div>
+          <div class="sub">NGUYENVANAN</div>
+          <button class="btn" id="btnA">🚀 Cài đặt Locket</button>
+        </div>
+      <div class="notice-inline">
+  ⚠️ ĐÂY LÀ PHIÊN BẢN HOÀN TOÀN MIỄN PHÍ VÀ CHÚNG TÔI SẼ KHÔNG CHỊU BẤT CỨ TRÁCH NHIỆM NÀO KHI NGƯỜI DÙNG SỬ DỤNG,
+  VÀ CẤM SỬ DỤNG TRANG WEB ĐỂ BUÔN BÁN DƯỚI MỌI HÌNH THỨC :
+  BẢN QUYỀN THUỘC VỀ NGUYENVANAN (ZAARA)
+</div>
+      </section>
+
+      <section class="card pane-b" id="paneB">
+        <div>
+          <div class="logo" aria-hidden="true">
+            <div class="ring" style="background:conic-gradient(from 0deg,#33e,#0fd,#33e)"></div>
+            <div class="core" id="logoB" style="background:linear-gradient(135deg,#33e,#0fd)"><img src="https://dl-image.3u.com/icon/2025/09/27/932747118/1758986409181_331516.jpg" alt="" loading="lazy" decoding="async" referrerpolicy="no-referrer"></div>
+          </div>
+          <h1>Shadowrocket</h1>
+          <div class="chips">
+            <span class="chip">🛡️ VPN</span>
+            <span class="chip">iOS 12+</span>
+          </div>
+          <div class="sub">NGUYENVANAN</div>
+          <button class="btn" id="btnB">🚀 Cài đặt Shadowrocket</button>
+        </div>
+      <div class="notice-inline">
+  ⚠️ ĐÂY LÀ PHIÊN BẢN HOÀN TOÀN MIỄN PHÍ VÀ CHÚNG TÔI SẼ KHÔNG CHỊU BẤT CỨ TRÁCH NHIỆM NÀO KHI NGƯỜI DÙNG SỬ DỤNG,
+  VÀ CẤM SỬ DỤNG TRANG WEB ĐỂ BUÔN BÁN DƯỚI MỌI HÌNH THỨC :
+  BẢN QUYỀN THUỘC VỀ NGUYENVANAN (ZAARA)
+</div>
+      </section>
+    </div>
+  </div>
+
+  <!-- Full-screen overlay placed LAST to sit above everything -->
+  <div class="overlay" aria-hidden="true">
+    <div class="vg top" id="vgTop"></div>
+    <div class="vg bottom" id="vgBottom"></div>
+  </div>
+.alert-top {
+  position: sticky; 
+  top: 0; 
+  z-index: 9999;
+  background: #111; 
+  color: #fff;
+  padding: 10px 14px; 
+  font-weight: 700; 
+  line-height: 1.4;
+  text-align: center; 
+  font-size: 14px;
+  border-bottom: 2px solid #ffcc00;
+}
+  <script>
+    const LOCKET_URL = 'itms-services://?action=download-manifest&url=https%3A%2F%2Fipa.idapple.vn%2Fapp%2Fng9hw6.plist';
+    const SHADOW_URL = 'itms-services://?action=download-manifest&url=https://dl.3u.com/plist/2025/09/28/1759023053857_696086.plist';
+
+    const stage = document.getElementById('stage');
+    const paneA = document.getElementById('paneA');
+    const paneB = document.getElementById('paneB');
+    const vgTop = document.getElementById('vgTop');
+    const vgBottom = document.getElementById('vgBottom');
+    const a1 = document.getElementById('a1');
+    const a2 = document.getElementById('a2');
+
+    document.getElementById('btnA').addEventListener('click', (e)=>{ e.stopPropagation(); window.location.href = LOCKET_URL; });
+    document.getElementById('btnB').addEventListener('click', (e)=>{ e.stopPropagation(); window.location.href = SHADOW_URL; });
+
+    let current = 0; // 0 = A top, 1 = B top
+    let startY = 0; let lastY = 0; let dragging = false; let height = 0;
+
+    const t = v => `translate3d(0,${v}px,0)`;
+    const cardTransform = (offset, progress) => `${t(offset)} rotateX(${progress*10}deg) scale(${1 - Math.min(Math.abs(progress)*0.06, 0.06)})`;
+
+    const clamp = (v,min,max)=> Math.max(min, Math.min(max, v));
+    function setVignette(p){
+      const topOp = clamp((-p)*0.85, 0, .55);
+      const botOp = clamp(( p)*0.85, 0, .55);
+      vgTop.style.opacity = topOp; vgBottom.style.opacity = botOp;
+    }
+    function setParallax(p){
+      const amt1 = p * 14; // px
+      const amt2 = -p * 12;
+      a1.style.transform = `translate3d(0,${amt1}px,0)`;
+      a2.style.transform = `translate3d(0,${amt2}px,0)`;
+    }
+
+    function layout(){
+      height = stage.clientHeight;
+      if(current===0){
+        paneA.style.transform = t(0);
+        paneB.style.transform = t(height);
+      }else{
+        paneA.style.transform = t(-height);
+        paneB.style.transform = t(0);
+      }
+      setVignette(0); setParallax(0);
+    }
+
+    function snap(){
+      stage.classList.add('animate');
+      if(current===0){
+        paneA.style.transform = t(0);
+        paneB.style.transform = t(height);
+      }else{
+        paneA.style.transform = t(-height);
+        paneB.style.transform = t(0);
+      }
+      setVignette(0);
+      setParallax(0);
+    }
+
+    function onStart(y){ dragging = true; startY = lastY = y; stage.classList.remove('animate'); }
+    function onMove(y){ if(!dragging) return; const dy = y - startY; lastY = y;
+      const limit = Math.max(-height, Math.min(height, dy));
+      const p = limit/height; // -1..1
+      if(current===0){
+        paneA.style.transform = cardTransform(limit,  p);
+        paneB.style.transform = cardTransform(height+limit, p);
+      }else{
+        paneA.style.transform = cardTransform(-height+limit, p);
+        paneB.style.transform = cardTransform(limit, p);
+      }
+      setVignette(p); setParallax(p);
+    }
+    function onEnd(){ if(!dragging) return; dragging = false;
+      const dy = lastY - startY;
+      if(Math.abs(dy) > height*0.18){ current = dy < 0 ? 1 : 0; }
+      snap();
+    }
+
+    // Pointer events (fast + cross-platform)
+    stage.addEventListener('pointerdown', e=>{ stage.setPointerCapture(e.pointerId); onStart(e.clientY); });
+    stage.addEventListener('pointermove',  e=> onMove(e.clientY));
+    stage.addEventListener('pointerup',    ()=> onEnd());
+    stage.addEventListener('pointercancel',()=> onEnd());
+
+    window.addEventListener('resize', ()=>{ layout(); snap(); });
+    window.addEventListener('pageshow', ()=>{ layout(); snap(); });
+
+    // === Custom inner logo image via URL params ===
+    function setLogoImage(coreId, url){
+      if(!url) return; const el = document.getElementById(coreId); if(!el) return; const img = el.querySelector('img');
+      try{ img.src = url; img.style.opacity = '1'; }catch{}
+    }
+    const params = new URLSearchParams(location.search);
+    setLogoImage('logoA', params.get('logoA'));
+    setLogoImage('logoB', params.get('logoB'));
+
+    layout(); snap();
+
+    // lightweight stars
+    const stars = document.getElementById('stars');
+    const N = 20;
+    for(let i=0;i<N;i++){
+      const s = document.createElement('div'); s.className='star';
+      s.style.left = Math.random()*100 + '%'; s.style.top = Math.random()*100 + '%';
+      s.style.opacity = Math.random()*.9 + .1; s.style.animationDelay = (Math.random()*3)+'s';
+      stars.appendChild(s);
+    }
+  </script>
+      <div style="position:fixed;left:50%;bottom:calc(env(safe-area-inset-bottom) + 8px);transform:translateX(-50%);font:600 11px/1 Inter,system-ui,sans-serif;color:#9aa4d8;opacity:.85;z-index:50;pointer-events:none;white-space:nowrap;">© <script>document.write(new Date().getFullYear())</script> ZAARA</div>
+  
+</body>
+</html>
