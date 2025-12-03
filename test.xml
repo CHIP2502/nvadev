@@ -1,0 +1,129 @@
+<mxGraphModel dx="1000" dy="1000" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+  <root>
+    <mxCell id="0" />
+    <mxCell id="1" parent="0" />
+    
+    <mxCell id="2" value="QUY TRÌNH QUYẾT ĐỊNH MUA HÀNG XANH (NGƯỜI TIÊU DÙNG ĐÔ THỊ)" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=16;fontStyle=1" vertex="1" parent="1">
+      <mxGeometry x="160" y="40" width="520" height="30" as="geometry" />
+    </mxCell>
+
+    <mxCell id="3" value="NHẬN THỨC &amp; ĐỘNG CƠ" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontStyle=1" vertex="1" parent="1">
+      <mxGeometry x="80" y="120" width="200" height="40" as="geometry" />
+    </mxCell>
+    
+    <mxCell id="4" value="Lợi ích Cá nhân&#xa;(Sức khỏe, An toàn)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#6c8ebf;" vertex="1" parent="1">
+      <mxGeometry x="60" y="200" width="120" height="60" as="geometry" />
+    </mxCell>
+    
+    <mxCell id="5" value="Ảnh hưởng Xã hội&#xa;(Trend, Đẳng cấp)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#6c8ebf;" vertex="1" parent="1">
+      <mxGeometry x="200" y="200" width="120" height="60" as="geometry" />
+    </mxCell>
+
+    <mxCell id="6" value="BỘ LỌC TÂM LÝ" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontStyle=1" vertex="1" parent="1">
+      <mxGeometry x="440" y="120" width="200" height="40" as="geometry" />
+    </mxCell>
+
+    <mxCell id="7" value="Rào cản Niềm tin&#xa;(Check: Greenwashing?)" style="rhombus;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;" vertex="1" parent="1">
+      <mxGeometry x="460" y="190" width="160" height="80" as="geometry" />
+    </mxCell>
+    
+    <mxCell id="8" value="Độ nhạy cảm về Giá&#xa;(Check: Đắt hơn <20%?)" style="rhombus;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;" vertex="1" parent="1">
+      <mxGeometry x="460" y="310" width="160" height="80" as="geometry" />
+    </mxCell>
+
+    <mxCell id="9" value="Sự Thuận tiện&#xa;(Check: Dễ mua?)" style="rhombus;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;" vertex="1" parent="1">
+      <mxGeometry x="460" y="430" width="160" height="80" as="geometry" />
+    </mxCell>
+
+    <mxCell id="10" value="KẾT QUẢ" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontStyle=1" vertex="1" parent="1">
+      <mxGeometry x="720" y="120" width="120" height="40" as="geometry" />
+    </mxCell>
+
+    <mxCell id="11" value="QUYẾT ĐỊNH&#xa;MUA HÀNG" style="ellipse;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontStyle=1;fontSize=14" vertex="1" parent="1">
+      <mxGeometry x="710" y="435" width="140" height="70" as="geometry" />
+    </mxCell>
+    
+    <mxCell id="12" value="Bỏ qua / Trì hoãn" style="shape=process;whiteSpace=wrap;html=1;backgroundOutline=1;fillColor=#f8cecc;strokeColor=#b85450;" vertex="1" parent="1">
+      <mxGeometry x="660" y="330" width="120" height="40" as="geometry" />
+    </mxCell>
+
+    <mxCell id="13" value="" style="endArrow=classic;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="3" target="4">
+      <mxGeometry width="50" height="50" relative="1" as="geometry">
+        <mxPoint x="400" y="400" as="sourcePoint" />
+        <mxPoint x="450" y="350" as="targetPoint" />
+        <Array as="points">
+          <mxPoint x="180" y="180" />
+          <mxPoint x="120" y="180" />
+        </Array>
+      </mxGeometry>
+    </mxCell>
+    
+    <mxCell id="14" value="" style="endArrow=classic;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="3" target="5">
+      <mxGeometry width="50" height="50" relative="1" as="geometry">
+        <mxPoint x="190" y="170" as="sourcePoint" />
+        <mxPoint x="270" y="210" as="targetPoint" />
+        <Array as="points">
+          <mxPoint x="180" y="180" />
+          <mxPoint x="260" y="180" />
+        </Array>
+      </mxGeometry>
+    </mxCell>
+
+    <mxCell id="15" value="Kích thích nhu cầu" style="endArrow=classic;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="5" target="7">
+      <mxGeometry width="50" height="50" relative="1" as="geometry">
+        <mxPoint x="400" y="400" as="sourcePoint" />
+        <mxPoint x="450" y="350" as="targetPoint" />
+      </mxGeometry>
+    </mxCell>
+    
+    <mxCell id="16" value="" style="endArrow=classic;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="4" target="7">
+      <mxGeometry width="50" height="50" relative="1" as="geometry">
+        <mxPoint x="330" y="240" as="sourcePoint" />
+        <mxPoint x="470" y="240" as="targetPoint" />
+      </mxGeometry>
+    </mxCell>
+
+    <mxCell id="17" value="Tin tưởng" style="endArrow=classic;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;fontColor=#009900;" edge="1" parent="1" source="7" target="8">
+      <mxGeometry width="50" height="50" relative="1" as="geometry">
+        <mxPoint x="400" y="400" as="sourcePoint" />
+        <mxPoint x="450" y="350" as="targetPoint" />
+      </mxGeometry>
+    </mxCell>
+
+    <mxCell id="18" value="Hợp lý" style="endArrow=classic;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;fontColor=#009900;" edge="1" parent="1" source="8" target="9">
+      <mxGeometry width="50" height="50" relative="1" as="geometry">
+        <mxPoint x="400" y="400" as="sourcePoint" />
+        <mxPoint x="450" y="350" as="targetPoint" />
+      </mxGeometry>
+    </mxCell>
+
+    <mxCell id="19" value="Tiện lợi" style="endArrow=classic;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;fillColor=#d5e8d4;strokeColor=#82b366;strokeWidth=2;" edge="1" parent="1" source="9" target="11">
+      <mxGeometry width="50" height="50" relative="1" as="geometry">
+        <mxPoint x="400" y="400" as="sourcePoint" />
+        <mxPoint x="450" y="350" as="targetPoint" />
+      </mxGeometry>
+    </mxCell>
+
+    <mxCell id="20" value="Nghi ngờ" style="endArrow=classic;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0;entryDx=0;entryDy=0;edgeStyle=orthogonalEdgeStyle;dashed=1;fontColor=#FF0000;" edge="1" parent="1" source="7" target="12">
+      <mxGeometry width="50" height="50" relative="1" as="geometry">
+        <mxPoint x="400" y="400" as="sourcePoint" />
+        <mxPoint x="450" y="350" as="targetPoint" />
+      </mxGeometry>
+    </mxCell>
+
+    <mxCell id="21" value="Quá đắt" style="endArrow=classic;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;dashed=1;fontColor=#FF0000;" edge="1" parent="1" source="8" target="12">
+      <mxGeometry width="50" height="50" relative="1" as="geometry">
+        <mxPoint x="400" y="400" as="sourcePoint" />
+        <mxPoint x="450" y="350" as="targetPoint" />
+      </mxGeometry>
+    </mxCell>
+
+     <mxCell id="22" value="Bất tiện" style="endArrow=classic;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0.5;entryY=1;entryDx=0;entryDy=0;edgeStyle=orthogonalEdgeStyle;dashed=1;fontColor=#FF0000;" edge="1" parent="1" source="9" target="12">
+      <mxGeometry width="50" height="50" relative="1" as="geometry">
+        <mxPoint x="630" y="360" as="sourcePoint" />
+        <mxPoint x="670" y="360" as="targetPoint" />
+      </mxGeometry>
+    </mxCell>
+
+  </root>
+</mxGraphModel>
